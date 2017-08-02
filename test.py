@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -7,6 +9,7 @@ import random
 import string
 import HomePage
 import unittest
+import unicodedata
 
 ##### TO REMOVE
 
@@ -16,32 +19,45 @@ class SingInTests(unittest.TestCase):
 		self.driver.get("https://www.goduo.com/")
 
 	def test_create_new_user(self):
-		home_page = HomePage.HomePageObject()
-		birth_date = [random.randint(1,31),random.randint(1,12),random.randint(1937,1999)]
+		home_page = HomePage.HomePageObject(self.driver)
 		
-		sex = [random.randint(0,1), random.randint(0,1)]
-		iam = self.driver.find_element(By.XPATH, "//label[@for='" + home_page.iam[sex[0]] + "']").click()
-		looking = self.driver.find_element(By.XPATH, "//label[@for='" + home_page.looking[sex[1]] + "']").click()
+		home_page.add_interests()
+		home_page.add_birth_date()
+		home_page.add_region()
+		home_page.add_email("test@papapa.com")
+		#self.driver.find_element_by_name(home_page.email).send_keys("roc.itxart@redbooth.com")
+		home_page.add_username()
+		home_page.add_password()
+		home_page.click_register()
 
-		day = Select(self.driver.find_element_by_name(home_page.birthdayDay))
-		day.select_by_value(str(birth_date[0]))
-		
-		month = Select(self.driver.find_element_by_name(home_page.birthdayMonth))
-		month.select_by_value(str(birth_date[1]).zfill(2))
-		
-		year = Select(self.driver.find_element_by_name(home_page.birthdayYear))
-		year.select_by_value(str(birth_date[2]))
+	def test_empty_data(self):
+		home_page = HomePage.HomePageObject(self.driver)
+		home_page.click_register()
+		emptyDateText = self.driver.find_element_by_css_selector('div.tooltipOwn.birthDateDay').text
+		assert emptyDateText == 'La fecha introducida es incorrecta'
 
+		#Region already is set the first time you open the website, i.e. Valencia, seems a bug, forcing to be empty
 		region = Select(self.driver.find_element_by_id(home_page.region))
-		region.select_by_value(str(random.randint(1,50)).zfill(2))
+		region.select_by_value(str(0))
 
-		## MODIFYYYYY !!!!
-		email = self.driver.find_element_by_name(home_page.email).send_keys("roc.itxart@redbooth.com")
-		
-		user = self.driver.find_element_by_name(home_page.user).send_keys(''.join(random.sample(string.ascii_lowercase, 10)))
+		emptyRegionText = self.driver.find_element_by_css_selector('div.tooltipOwn.province').text
+		assert emptyRegionText == u'No puede estar vacío'
+		emptyEmailText = self.driver.find_element_by_css_selector('div.tooltipOwn.email').text
+		assert emptyEmailText == u'El email no puede estar vacío'
+		emptyUserNameText = self.driver.find_element_by_css_selector('div.tooltipOwn.userLogin').text
+		assert emptyUserNameText == u'El usuario no puede estar vacío'
+		emptyPasswordText = self.driver.find_element_by_css_selector('div.tooltipOwn.password').text
+		assert emptyPasswordText == u'La contraseña no puede estar vacía'
 
-		password = self.driver.find_element_by_name(home_page.password).send_keys(''.join(random.sample(string.ascii_lowercase, 10)))
-		self.driver.find_element_by_name("register").click()
+	def test_show_repeated_email(self):
+		home_page = HomePage.HomePageObject(self.driver)
+
+		#Using an email already registered, to make the failure message appears, 
+		home_page.add_email("test@papapa.com")
+		home_page.click_register()
+		alreadyUsedUserNameText = self.driver.find_element_by_css_selector('div.tooltipOwn.email').text
+		assert alreadyUsedUserNameText == u'El email introducido ya está en uso'
+
 	def tearDown(self):
 		self.driver.quit()
 
