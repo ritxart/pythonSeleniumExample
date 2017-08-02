@@ -1,5 +1,3 @@
-from SeleniumBase import driver
-
 class HomePageObject():
 	#Form locators
 	iam = ["femaleSoy", "maleSoy"]

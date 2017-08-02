@@ -9,7 +9,7 @@ import HomePage
 
 ##### TO REMOVE
 
-class HomePageTests():
+class SingInTests():
 #	def setUp(self):
 		driver = webdriver.Chrome('/Library/Python/2.7/site-packages/selenium/webdriver/chrome/chromedriver')
 		driver.get("https://www.goduo.com/")
@@ -40,6 +40,6 @@ class HomePageTests():
 		user = driver.find_element_by_name(home_page.user).send_keys(''.join(random.sample(string.ascii_lowercase, 10)))
 
 		password = driver.find_element_by_name(home_page.password).send_keys(''.join(random.sample(string.ascii_lowercase, 10)))
-
+		driver.find_element_by_name("register").click()
 #	def tearDown(self):
 		driver.quit()
