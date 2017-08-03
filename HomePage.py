@@ -19,6 +19,7 @@ class HomePageObject(BasePage):
 	user = 'userLogin'
 	password = 'password'
 	register = 'register'
+	loginButton = 'a.btn.btn-azul.btn--brand'
 
 	def add_interests(self):
 		sex = [random.randint(0,1), random.randint(0,1)]
@@ -44,11 +45,16 @@ class HomePageObject(BasePage):
 		region = Select(self.driver.find_element_by_id(self.region))
 		region.select_by_value(str(random.randint(1,50)).zfill(2))
 
-	def add_username(self):
-		user = self.driver.find_element_by_name(self.user).send_keys(''.join(random.sample(string.ascii_lowercase, 10)))
+	def add_username(self, len=10):
+		username = ''.join(random.sample(string.ascii_lowercase, len))
+		user = self.driver.find_element_by_name(self.user).send_keys(username)
+		return username
 
-	def add_password(self):
-		password = self.driver.find_element_by_name(self.password).send_keys(''.join(random.sample(string.ascii_lowercase, 10)))
+	def add_password(self, len=10):
+		password = self.driver.find_element_by_name(self.password).send_keys(''.join(random.sample(string.ascii_lowercase, len)))
 	
 	def click_register(self):
-		self.driver.find_element_by_name(self.register).click()	
+		self.driver.find_element_by_name(self.register).click()
+
+	def click_already_user(self):
+		self.driver.find_element_by_css_selector(self.loginButton).click()
